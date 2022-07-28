@@ -1,5 +1,9 @@
 @import "~bootstrap/scss/bootstrap";
 
+body {
+  cursor: default;
+}
+
 :root {
   --shadow-color: 0deg 0% 76%;
   --shadow-elevation-low: 0px -0.5px 0.5px hsl(var(--shadow-color) / 0.28),

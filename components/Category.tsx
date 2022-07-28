@@ -36,7 +36,7 @@ export const Category: React.FC<Props> = ({
   useEffect(() => {
     const total = localSubcategories
       .map((sc) => sc?.annualAmount)
-      .reduce((prev, val) => prev! + val!);
+      .reduce((prev, val) => prev! + val!, 0);
 
     if (total !== sum) {
       onChange(name, total, type);
@@ -108,13 +108,18 @@ export const Category: React.FC<Props> = ({
         </thead>
         <tbody>
           {localSubcategories.map((sc, i) => (
-            <LineItem subCategory={sc} key={i} onChange={onLocalChange} />
+            <LineItem
+              subCategory={sc}
+              key={i}
+              onChange={onLocalChange}
+              onRemove={removeCategory}
+            />
           ))}
           <tr>
             <td></td>
             <td>
               <Button variant="outline-primary" onClick={handleShow}>
-                Add line item
+                Add sub category
               </Button>
             </td>
             <td></td>
@@ -143,7 +148,7 @@ export const Category: React.FC<Props> = ({
             onClick={addCategory}
             disabled={newCat.length < 3}
           >
-            Save Sub category
+            Save sub category
           </Button>
         </Modal.Footer>
       </Modal>
