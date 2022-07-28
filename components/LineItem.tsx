@@ -30,7 +30,7 @@ export interface Props {
   ) => void;
 }
 
-const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
+export const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
   const [rawAmount, setRawAmount] = useLocalState<string>(
     `${subCategory.name}-lineitem-raw`,
     subCategory.amount
@@ -110,5 +110,3 @@ const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
     </tr>
   );
 };
-
-export default LineItem;

@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Modal, Table } from "react-bootstrap";
 import { currencyFormat } from "../lib/currencyFormat";
-import { SubCategory, Frequency } from "./LineItem";
-import dynamic from "next/dynamic";
+import { LineItem, SubCategory, Frequency } from "./LineItem";
 import { useLocalState } from "../lib/useLocalState";
-
-const DynamicLineItem = dynamic(() => import("./LineItem"), {
-  ssr: false,
-});
-
 interface Props {
   name: string;
   type: "income" | "expense";
@@ -17,7 +11,7 @@ interface Props {
   color?: string;
 }
 
-const Category: React.FC<Props> = ({
+export const Category: React.FC<Props> = ({
   name,
   type,
   onChange,
@@ -114,11 +108,7 @@ const Category: React.FC<Props> = ({
         </thead>
         <tbody>
           {localSubcategories.map((sc, i) => (
-            <DynamicLineItem
-              subCategory={sc}
-              key={i}
-              onChange={onLocalChange}
-            />
+            <LineItem subCategory={sc} key={i} onChange={onLocalChange} />
           ))}
           <tr>
             <td></td>
@@ -168,5 +158,3 @@ const Category: React.FC<Props> = ({
     </>
   );
 };
-
-export default Category;
