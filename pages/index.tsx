@@ -38,10 +38,10 @@ const Home: NextPage = () => {
     amount: number,
     type: "income" | "expense"
   ) => {
-    const existing = totals.find((t) => t.name === name);
-    if (existing) {
-      setTotals((prev) =>
-        prev.map((t) => {
+    setTotals((prev) => {
+      const existing = prev.find((t) => t.name === name);
+      if (existing) {
+        return prev.map((t) => {
           if (t.name === name) {
             return {
               ...t,
@@ -50,18 +50,18 @@ const Home: NextPage = () => {
           } else {
             return t;
           }
-        })
-      );
-    } else {
-      setTotals((prev) => [
-        ...prev,
-        {
-          name,
-          amount,
-          type,
-        },
-      ]);
-    }
+        });
+      } else {
+        return [
+          ...prev,
+          {
+            name,
+            amount,
+            type,
+          },
+        ];
+      }
+    });
   };
 
   return (

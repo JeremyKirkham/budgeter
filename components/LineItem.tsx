@@ -5,12 +5,12 @@ import { currencyFormat } from "../lib/currencyFormat";
 import { useLocalState } from "../lib/useLocalState";
 
 export enum Frequency {
-  daily = "daily",
-  weekly = "weekly",
-  fortnightly = "fortnightly",
-  monthly = "monthly",
-  quarterly = "quarterly",
-  annually = "annually",
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Fortnightly = "Fortnightly",
+  Monthly = "Monthly",
+  Quarterly = "Quarterly",
+  Annually = "Annually",
 }
 
 export interface SubCategory {
@@ -38,30 +38,34 @@ const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
   const [annualAmount, _setAnnualAmount] = useState(subCategory.annualAmount);
   const [freq, setFreq] = useLocalState<Frequency>(
     `${subCategory.name}-lineitem-freq`,
-    Frequency.daily
+    subCategory.frequency
   );
 
   useEffect(() => {
     let newAnnual;
-    switch (freq) {
-      case Frequency.daily:
-        newAnnual = parseFloat(rawAmount) * 365;
-        break;
-      case Frequency.weekly:
-        newAnnual = parseFloat(rawAmount) * 52;
-        break;
-      case Frequency.fortnightly:
-        newAnnual = parseFloat(rawAmount) * 26;
-        break;
-      case Frequency.monthly:
-        newAnnual = parseFloat(rawAmount) * 12;
-        break;
-      case Frequency.quarterly:
-        newAnnual = parseFloat(rawAmount) * 4;
-        break;
-      case Frequency.annually:
-        newAnnual = parseFloat(rawAmount);
-        break;
+    if (rawAmount == "") {
+      newAnnual = 0;
+    } else {
+      switch (freq) {
+        case Frequency.Daily:
+          newAnnual = parseFloat(rawAmount) * 365;
+          break;
+        case Frequency.Weekly:
+          newAnnual = parseFloat(rawAmount) * 52;
+          break;
+        case Frequency.Fortnightly:
+          newAnnual = parseFloat(rawAmount) * 26;
+          break;
+        case Frequency.Monthly:
+          newAnnual = parseFloat(rawAmount) * 12;
+          break;
+        case Frequency.Quarterly:
+          newAnnual = parseFloat(rawAmount) * 4;
+          break;
+        case Frequency.Annually:
+          newAnnual = parseFloat(rawAmount);
+          break;
+      }
     }
     const diff = newAnnual - annualAmount;
     if (diff !== 0) {
@@ -94,6 +98,7 @@ const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
           decimalsLimit={2}
           value={rawAmount}
           onValueChange={(value) => setRawAmount(value ?? "")}
+          placeholder="$0.00"
         />
       </td>
       <td>{currencyFormat(annualAmount)}</td>

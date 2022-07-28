@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Table } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Form, Modal, Table } from "react-bootstrap";
 import { currencyFormat } from "../lib/currencyFormat";
 import { SubCategory, Frequency } from "./LineItem";
 import dynamic from "next/dynamic";
+import { useLocalState } from "../lib/useLocalState";
 
 const DynamicLineItem = dynamic(() => import("./LineItem"), {
   ssr: false,
@@ -16,7 +17,7 @@ interface Props {
   color?: string;
 }
 
-export const Category: React.FC<Props> = ({
+const Category: React.FC<Props> = ({
   name,
   type,
   onChange,
@@ -24,14 +25,36 @@ export const Category: React.FC<Props> = ({
   subCategories = [],
 }) => {
   const [sum, setSum] = useState(0);
-  const [localSubcategories, setLocalSubcategories] = useState<SubCategory[]>(
+  const [show, setShow] = useState(false);
+  const [newCat, setNewCat] = useState("");
+  const [localSubcategories, setLocalSubcategories] = useLocalState<
+    SubCategory[]
+  >(
+    `${name}-cat`,
     subCategories.map((sc) => ({
       name: sc,
       amount: 0,
-      frequency: Frequency.weekly,
+      frequency: Frequency.Weekly,
       annualAmount: 0,
     }))
   );
+
+  useEffect(() => {
+    const total = localSubcategories
+      .map((sc) => sc?.annualAmount)
+      .reduce((prev, val) => prev! + val!);
+
+    if (total !== sum) {
+      onChange(name, total, type);
+      setSum(total);
+    }
+  }, [name, onChange, type, sum, localSubcategories]);
+
+  const handleClose = () => {
+    setShow(false);
+    setNewCat("");
+  };
+  const handleShow = () => setShow(true);
 
   const onLocalChange = (
     name: string,
@@ -51,21 +74,30 @@ export const Category: React.FC<Props> = ({
         return sc;
       }
     });
-
-    const total = newSubs
-      .map((sc) => sc?.annualAmount)
-      .reduce((prev, val) => prev! + val!);
-
-    onChange(name, total, type);
-    setSum(total);
     setLocalSubcategories(newSubs);
   };
 
-  const addSubcategory = (name: string) => {
-    setLocalSubcategories((prev) => [
-      ...prev,
-      { name, amount: 0, annualAmount: 0, frequency: Frequency.weekly },
-    ]);
+  const addCategory = () => {
+    if (newCat.length > 0) {
+      const newCategories: SubCategory[] = [
+        ...localSubcategories,
+        {
+          name: newCat,
+          frequency: Frequency.Weekly,
+          amount: 0,
+          annualAmount: 0,
+        },
+      ];
+
+      setLocalSubcategories(newCategories);
+    }
+    handleClose();
+  };
+
+  const removeCategory = (name: string) => {
+    const newCategories = localSubcategories.filter((sc) => sc.name !== name);
+
+    setLocalSubcategories(newCategories);
   };
 
   return (
@@ -88,8 +120,43 @@ export const Category: React.FC<Props> = ({
               onChange={onLocalChange}
             />
           ))}
+          <tr>
+            <td></td>
+            <td>
+              <Button variant="outline-primary" onClick={handleShow}>
+                Add line item
+              </Button>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
         </tbody>
       </Table>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>New sub category</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Control
+            value={newCat}
+            onChange={(e) => setNewCat(e.target.value)}
+            placeholder="Sub category name"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={addCategory}
+            disabled={newCat.length < 3}
+          >
+            Save Sub category
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <style jsx>{`
         .headertr {
           background: ${color ?? "default"};
@@ -101,3 +168,5 @@ export const Category: React.FC<Props> = ({
     </>
   );
 };
+
+export default Category;
