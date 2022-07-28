@@ -67,11 +67,11 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Budgeter | A budgeting tool for everyone!</title>
+        <title>Budget Better - A budgeting tool for everyone!</title>
       </Head>
       <Container className="mt-3 py-3">
         <h1 className="text-center my-3">
-          Budgeter - A budgeting tool for everyone!
+          Budget Better - A budgeting tool for everyone!
         </h1>
         <div className="cont">
           <h2 className="income-h1">INCOME</h2>

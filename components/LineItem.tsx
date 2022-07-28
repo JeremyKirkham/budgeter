@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import CurrencyInput from "react-currency-input-field";
 import { currencyFormat } from "../lib/currencyFormat";
+import { useLocalState } from "../lib/useLocalState";
 
 export enum Frequency {
   daily = "daily",
@@ -29,55 +30,55 @@ export interface Props {
   ) => void;
 }
 
-export const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
-  const [amount, _setAmount] = useState(subCategory.amount);
+const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
+  const [rawAmount, setRawAmount] = useLocalState<string>(
+    `${subCategory.name}-lineitem-raw`,
+    subCategory.amount
+  );
   const [annualAmount, _setAnnualAmount] = useState(subCategory.annualAmount);
-  const [freq, setFreq] = useState(Frequency.daily);
-
-  const setAmount = (newVal?: string) => {
-    if (newVal != null) {
-      const numVal = parseFloat(newVal);
-      _setAmount(numVal);
-    } else {
-      _setAmount(0);
-    }
-  };
+  const [freq, setFreq] = useLocalState<Frequency>(
+    `${subCategory.name}-lineitem-freq`,
+    Frequency.daily
+  );
 
   useEffect(() => {
     let newAnnual;
     switch (freq) {
       case Frequency.daily:
-        newAnnual = amount * 365;
+        newAnnual = parseFloat(rawAmount) * 365;
         break;
       case Frequency.weekly:
-        newAnnual = amount * 52;
+        newAnnual = parseFloat(rawAmount) * 52;
         break;
       case Frequency.fortnightly:
-        newAnnual = amount * 26;
+        newAnnual = parseFloat(rawAmount) * 26;
         break;
       case Frequency.monthly:
-        newAnnual = amount * 12;
+        newAnnual = parseFloat(rawAmount) * 12;
         break;
       case Frequency.quarterly:
-        newAnnual = amount * 4;
+        newAnnual = parseFloat(rawAmount) * 4;
         break;
       case Frequency.annually:
-        newAnnual = amount;
+        newAnnual = parseFloat(rawAmount);
         break;
     }
     const diff = newAnnual - annualAmount;
     if (diff !== 0) {
       _setAnnualAmount(newAnnual);
-      onChange(subCategory.name, freq, amount, newAnnual);
+      onChange(subCategory.name, freq, parseFloat(rawAmount), newAnnual);
     }
-  }, [subCategory.name, amount, annualAmount, freq, onChange]);
+  }, [subCategory.name, rawAmount, annualAmount, freq, onChange]);
 
   return (
     <tr>
       <td></td>
       <td>{subCategory.name}</td>
       <td>
-        <Form.Select onChange={(e) => setFreq(e.target.value as Frequency)}>
+        <Form.Select
+          value={freq}
+          onChange={(e) => setFreq(e.target.value as Frequency)}
+        >
           {Object.keys(Frequency).map((freq, i) => (
             <option key={i} value={freq}>
               {freq}
@@ -91,8 +92,8 @@ export const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
           prefix="$"
           defaultValue={0}
           decimalsLimit={2}
-          value={amount}
-          onValueChange={(value) => setAmount(value)}
+          value={rawAmount}
+          onValueChange={(value) => setRawAmount(value ?? "")}
         />
       </td>
       <td>{currencyFormat(annualAmount)}</td>
@@ -104,3 +105,5 @@ export const LineItem: React.FC<Props> = ({ subCategory, onChange }) => {
     </tr>
   );
 };
+
+export default LineItem;

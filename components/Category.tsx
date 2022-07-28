@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Table } from "react-bootstrap";
 import { currencyFormat } from "../lib/currencyFormat";
-import { LineItem, SubCategory, Frequency } from "./LineItem";
+import { SubCategory, Frequency } from "./LineItem";
+import dynamic from "next/dynamic";
+
+const DynamicLineItem = dynamic(() => import("./LineItem"), {
+  ssr: false,
+});
 
 interface Props {
   name: string;
@@ -77,7 +82,11 @@ export const Category: React.FC<Props> = ({
         </thead>
         <tbody>
           {localSubcategories.map((sc, i) => (
-            <LineItem subCategory={sc} key={i} onChange={onLocalChange} />
+            <DynamicLineItem
+              subCategory={sc}
+              key={i}
+              onChange={onLocalChange}
+            />
           ))}
         </tbody>
       </Table>
