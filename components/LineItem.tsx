@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import CurrencyInput from "react-currency-input-field";
+import { BsXCircle } from "react-icons/bs";
 import { currencyFormat } from "../lib/currencyFormat";
 import { useLocalState } from "../lib/useLocalState";
 
@@ -117,14 +118,7 @@ export const LineItem: React.FC<Props> = ({
           <div className="last">
             <span>{currencyFormat(annualAmount)}</span>
             <span className="delete-btn">
-              <Button
-                className="delete-btn"
-                size="sm"
-                variant="outline-danger"
-                onClick={localRemove}
-              >
-                X
-              </Button>
+              <BsXCircle size="16" onClick={localRemove} />
             </span>
           </div>
         </td>
@@ -140,6 +134,8 @@ export const LineItem: React.FC<Props> = ({
         }
         .delete-btn {
           visibility: hidden;
+          cursor: pointer;
+          color: #bb2e3e;
         }
         tr:hover .delete-btn {
           visibility: visible;
