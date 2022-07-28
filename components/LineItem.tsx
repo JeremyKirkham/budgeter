@@ -46,6 +46,12 @@ export const LineItem: React.FC<Props> = ({
     subCategory.frequency
   );
 
+  const localRemove = () => {
+    localStorage.removeItem(`${subCategory.name}-lineitem-raw`);
+    localStorage.removeItem(`${subCategory.name}-lineitem-freq`);
+    onRemove(subCategory.name);
+  };
+
   useEffect(() => {
     let newAnnual;
     if (rawAmount == "") {
@@ -115,7 +121,7 @@ export const LineItem: React.FC<Props> = ({
                 className="delete-btn"
                 size="sm"
                 variant="outline-danger"
-                onClick={(e) => onRemove(subCategory.name)}
+                onClick={localRemove}
               >
                 X
               </Button>
